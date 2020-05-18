@@ -1,0 +1,21 @@
+@Library('jenkins_library@v0.1.2')
+import com.pratclot.*
+
+slack = new Slack(this).startThread()
+extendedSteps = new ExtendedSteps(this)
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Lint') {
+            steps {
+                script {
+                    extendedSteps """
+                        ./gradlew ktLintDebugCheck
+                    """
+                }
+            }
+        }
+    }
+}
