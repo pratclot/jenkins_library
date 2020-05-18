@@ -22,7 +22,7 @@ class Slack implements Serializable{
         return this
     }
 
-    public void updateThread(String message, String color = null, String timestamp = null) {
+    public Object updateThread(String message, String color = null, String timestamp = null) {
         List attachments = [
                 [
                         text    : message,
@@ -30,7 +30,7 @@ class Slack implements Serializable{
                         color   : color
                 ]
         ]
-        callerScript.slackSend(
+        return callerScript.slackSend(
                 channel: slackInitialResponse.threadId,
                 attachments: attachments,
                 timestamp: timestamp
