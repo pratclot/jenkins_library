@@ -10,19 +10,26 @@ class ExtendedSteps implements Serializable{
     }
 
     def call(shellCommands) {
-        lastStage = callerScript.env.STAGE_NAME
-        updateGitHubStatus("pending")
-        String ts = updateSlackStatus("Starting ${lastStage} stage...").ts
-        try {
-            callerScript.sh """
+        callerScript.withCredentials([
+                callerScript.file(credentialsId: callerScript.GOOGLE_SERVICES_FILE_VAR_ID, variable: "GOOGLE_SERVICES_FILE_PATH"),
+                callerScript.string(credentialsId: callerScript.GOOGLE_PROJECT_VAR_ID, variable: "GOOGLE_PROJECT_ID"),
+                callerScript.file(credentialsId: callerScript.GOOGLE_SERVICE_CREDENTIALS_ID, variable: "PATH_TO_GOOGLE_SERVICE_KEY")
+        ]) {
+            lastStage = callerScript.env.STAGE_NAME
+            updateGitHubStatus("pending")
+            String ts = updateSlackStatus("Starting ${lastStage} stage...").ts
+            try {
+                callerScript.sh """
+                ln -fs ${callerScript.env.GOOGLE_SERVICES_FILE_PATH} app/google-services.json
                 ${shellCommands}
             """
-            updateGitHubStatus("success")
-            updateSlackStatus("good", "${lastStage} succeeded", ts)
-        } catch(ex) {
-            updateGitHubStatus("failure")
-            updateSlackStatus("danger", "${lastStage} failed", ts)
-            throw ex
+                updateGitHubStatus("success")
+                updateSlackStatus("good", "${lastStage} succeeded", ts)
+            } catch (ex) {
+                updateGitHubStatus("failure")
+                updateSlackStatus("danger", "${lastStage} failed", ts)
+                throw ex
+            }
         }
     }
 
