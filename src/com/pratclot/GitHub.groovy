@@ -14,7 +14,7 @@ class GitHub {
     static setBuildStatus(callerScript, String message, String state, String context) {
         callerScript.withCredentials([
                 callerScript.usernamePassword(
-                        credentialsId: 'pratclot_github_token',
+                        credentialsId: callerScript.GITHUB_TOKEN_ID,
                         usernameVariable: 'USER',
                         passwordVariable: 'PASS')
         ]) {
